@@ -24,39 +24,6 @@
 
 ;;; Code:
 
-;; ("^\\(#+\\)\\(.*\\)$" . ((1 font-lock-function-name-face)  (2 font-lock-constant-face)))
-
-(defgroup js4-mode nil
-  "An improved JavaScript mode."
-  :group 'languages)
-(defface js4-error-face
-  `((((class color) (background light))
-     (:foreground "red"))
-    (((class color) (background dark))
-     (:foreground "red"))
-    (t (:foreground "red")))
-  "Face for JavaScript errors."
-  :group 'js4-mode)
-
-
-(defface font-lock-type-face-no-bold
-  '((t :inherit font-lock-type-face :weight normal))
-  "Non-bolded version of font-lock-type-face"
-  :group 'font-lock-faces)
-
-(setq myKeywords
-      '(
-        ("^.*\\(--.*\\)$" . (1 font-lock-comment-face))
-        ("^[ ]*# .*$" . 'info-title-1)
-        ("^[ ]*## .*$" . 'info-title-2)
-        ("^[ ]*### .*$" . 'info-title-3)
-        ("^[ ]*#### .*$" . 'info-title-4)
-        ("def\\|if\\|else\\|series\\|then\\|parallel\\|->\\|include\\|require\\|λ" . font-lock-keyword-face)
-        ("\t" . whitespace-tab)
-        )
-      )
-
-
 (defun candy-script-mode-highlight-comments(&optional begReg endReg length) ; args for after-change-functions
   (interactive)
   (candy-script-mode-highlight-comments-remove)
@@ -96,6 +63,15 @@
 	  (delete-overlay overlay)))))
 
 (define-derived-mode candy-script-mode prog-mode
+  (setq myKeywords
+        '(
+          ("^.*\\(--.*\\)$" . (1 font-lock-comment-face))
+          ("^[ ]*# .*$" . 'info-title-1)
+          ("^[ ]*## .*$" . 'info-title-2)
+          ("^[ ]*### .*$" . 'info-title-3)
+          ("^[ ]*#### .*$" . 'info-title-4)
+          ("def\\|if\\|else\\|series\\|then\\|parallel\\|->\\|include\\|require\\|λ" . font-lock-keyword-face)
+          ("\t" . whitespace-tab)))
   (setq font-lock-defaults '(myKeywords))
   (setq mode-name "Candy-Script")
   (set (make-local-variable 'indent-tabs-mode) nil)
