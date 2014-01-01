@@ -40,7 +40,7 @@
         ;; ("^#### .*$" . info-title-4)
         ("^.*--\\(.*\\)$" . font-lock-comment-face)
         ;;   ("^#\\{2\\} .*$" . info-title-2)
-        ("^#.*$" . font-lock-variable-name-face)
+        ("^[ ]*#.*$" . font-lock-variable-name-face)
         ("def\\|if\\|else\\|series\\|then\\|parallel\\|->\\|include\\|require\\|λ" . font-lock-keyword-face)
         ("\t" . whitespace-tab)
         )
