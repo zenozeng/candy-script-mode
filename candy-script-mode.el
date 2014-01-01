@@ -24,22 +24,74 @@
 
 ;;; Code:
 
+;; ("^\\(#+\\)\\(.*\\)$" . ((1 font-lock-function-name-face)  (2 font-lock-constant-face)))
+
+(defface font-lock-type-face-no-bold
+  '((t :inherit font-lock-type-face :weight normal))
+  "Non-bolded version of font-lock-type-face"
+  :group 'font-lock-faces)
 
 (setq myKeywords
- '(("Sin\\|Cos\\|Sum" . font-lock-function-name-face)
-   ("Pi\\|Infinity" . font-lock-constant-face)
-   ("def\\|if\\|else\\|series\\|then\\|parallel\\|->" . font-lock-keyword-face)
-   ("^\t\t" . whitespace-indentation)
-   ("^\t" . whitespace-tab)
-  )
-)
+      '(
+        ;;   ("\".*" . font-lock-string-face)
+        ;; ("^# .*$" . info-title-1)
+        ;; ("^## .*$" . info-title-2)
+        ;; ("^### .*$" . info-title-3)
+        ;; ("^#### .*$" . info-title-4)
+        ;;   ("^.*--\\(.*\\)$" . font-lock-comment-face)
+        ;;   ("^#\\{2\\} .*$" . info-title-2)
+        ("^#.*$" . font-lock-variable-name-face)
+        ("def\\|if\\|else\\|series\\|then\\|parallel\\|->\\|include\\|require\\|λ" . font-lock-keyword-face)
+        ("\t" . whitespace-tab)
+        )
+      )
+
+
+
+(defun candy-script-mode-highlight-comments()
+  (interactive)
+  (candy-script-mode-highlight-comments-remove)
+  (setq points nil)
+  (save-excursion
+    (goto-char (point-min))
+    (while
+        (search-forward-regexp "\n\n\n" nil t)
+      (setq points (cons (point) points))))
+  (setq isBeg t)
+  (setq points (reverse points))
+  (while (car points)
+    (setq pos (car points))
+    (setq points (cdr points))
+    (if isBeg
+        (setq beg pos)
+      (setq end pos))
+    (when (not isBeg)
+      (candy-script-mode-highlight-comments-region beg end))
+    (setq isBeg (not isBeg))))
+
+(defun candy-script-mode-highlight-comments-region(beg end)
+  (setq new-overlay (make-overlay beg end))
+  (message "%S" new-overlay)
+  (overlay-put new-overlay 'face 'font-lock-comment-face)
+  (overlay-put new-overlay 'category "candy-script-mode-comment"))
+
+
+(defun candy-script-mode-highlight-comments-remove()
+  (let ((overlays (overlays-in (point-min) (point-max)))
+	(overlay))
+    (while (car overlays)
+      (setq overlay (pop overlays))
+      (if (member "candy-script-mode-comment" (overlay-properties overlay))
+	  (delete-overlay overlay)))))
 
 (define-derived-mode candy-script-mode fundamental-mode
   (setq font-lock-defaults '(myKeywords))
   (setq mode-name "Candy-Script")
-  (set (make-local-variable 'indent-tabs-mode) t)
-  (set (make-local-variable 'tab-width) 8)
-)
+  (set (make-local-variable 'indent-tabs-mode) nil)
+  (make-local-variable 'font-lock-extend-region-functions)
+  (make-local-variable 'post-self-insert-hook)
+  (candy-script-mode-highlight-comments)
+  (add-hook 'post-self-insert-hook 'candy-script-mode-highlight-comments))
 
 
 (provide 'candy-script-mode)
