@@ -38,7 +38,7 @@
         ;; ("^## .*$" . info-title-2)
         ;; ("^### .*$" . info-title-3)
         ;; ("^#### .*$" . info-title-4)
-        ;;   ("^.*--\\(.*\\)$" . font-lock-comment-face)
+        ("^.*--\\(.*\\)$" . font-lock-comment-face)
         ;;   ("^#\\{2\\} .*$" . info-title-2)
         ("^#.*$" . font-lock-variable-name-face)
         ("def\\|if\\|else\\|series\\|then\\|parallel\\|->\\|include\\|require\\|λ" . font-lock-keyword-face)
@@ -48,7 +48,7 @@
 
 
 
-(defun candy-script-mode-highlight-comments()
+(defun candy-script-mode-highlight-comments(&optional begReg endReg length) ; args for after-change-functions
   (interactive)
   (candy-script-mode-highlight-comments-remove)
   (setq points nil)
@@ -58,6 +58,8 @@
         (search-forward-regexp "\n\n\n" nil t)
       (setq points (cons (point) points))))
   (setq isBeg t)
+  (if (= (% (length points) 2) 1)
+      (setq points (cons (point-max) points)))
   (setq points (reverse points))
   (while (car points)
     (setq pos (car points))
@@ -89,9 +91,9 @@
   (setq mode-name "Candy-Script")
   (set (make-local-variable 'indent-tabs-mode) nil)
   (make-local-variable 'font-lock-extend-region-functions)
-  (make-local-variable 'post-self-insert-hook)
   (candy-script-mode-highlight-comments)
-  (add-hook 'post-self-insert-hook 'candy-script-mode-highlight-comments))
+  (make-local-variable 'after-change-functions)
+  (add-hook 'after-change-functions 'candy-script-mode-highlight-comments))
 
 
 (provide 'candy-script-mode)
