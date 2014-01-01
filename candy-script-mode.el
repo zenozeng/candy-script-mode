@@ -80,6 +80,9 @@
   (make-local-variable 'after-change-functions)
   (add-hook 'after-change-functions 'candy-script-mode-highlight-comments))
 
+(defun c()
+  (interactive)
+  (candy-script-mode))
 
 (provide 'candy-script-mode)
 ;;; candy-mode.el ends here
